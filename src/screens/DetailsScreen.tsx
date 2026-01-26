@@ -1,15 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
 
-type DetailsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Details'>;
-
-type Props = {
-  navigation: DetailsScreenNavigationProp;
-};
-
-export default function DetailsScreen({ navigation }: Props) {
+export default function DetailsScreen({ navigation }: any) {
   useEffect(() => {
     console.log('DetailsScreen montado');
     return () => {
@@ -21,12 +13,9 @@ export default function DetailsScreen({ navigation }: Props) {
     <View style={styles.container}>
       <Text style={styles.title}>Tela de Detalhes</Text>
       <Text style={styles.text}>
-        Esta é a tela de detalhes do aplicativo.
+        Esta é a tela de detalhes do aplicativo, com informações adicionais.
       </Text>
-      <Button
-        title="Voltar para Início"
-        onPress={() => navigation.navigate('Home')}
-      />
+      <Button title="Voltar para Início" onPress={() => navigation.navigate('Home')} />
     </View>
   );
 }
