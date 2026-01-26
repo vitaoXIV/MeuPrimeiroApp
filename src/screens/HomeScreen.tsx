@@ -16,6 +16,10 @@ export default function HomeScreen({ navigation }: any) {
         title="Ir para Detalhes"
         onPress={() => navigation.navigate('Details')}
       />
+      <Button
+        title="Ver Lista de Usuários"
+        onPress={() => navigation.navigate('List')}
+      />
     </View>
   );
 }
@@ -30,6 +34,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 20,
   },
 });
