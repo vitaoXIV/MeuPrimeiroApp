@@ -1,15 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
 
-type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
-
-type Props = {
-  navigation: HomeScreenNavigationProp;
-};
-
-export default function HomeScreen({ navigation }: Props) {
+export default function HomeScreen({ navigation }: any) {
   useEffect(() => {
     console.log('HomeScreen montado');
     return () => {
@@ -39,10 +31,5 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: 'bold',
     marginBottom: 10,
-  },
-  text: {
-    fontSize: 16,
-    marginBottom: 20,
-    textAlign: 'center',
   },
 });
