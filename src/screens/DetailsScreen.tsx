@@ -1,7 +1,11 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
 
-export default function DetailsScreen({ navigation }: any) {
+type Props = NativeStackScreenProps<RootStackParamList, 'Details'>;
+
+export default function DetailsScreen({ navigation }: Props) {
   useEffect(() => {
     console.log('DetailsScreen montado');
     return () => {

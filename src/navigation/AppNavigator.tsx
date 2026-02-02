@@ -4,16 +4,19 @@ import HomeScreen from '../screens/HomeScreen';
 import DetailsScreen from '../screens/DetailsScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import ListScreen from '../screens/ListScreen';
+import LoginScreen from '../screens/LoginScreen';
 
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
   return (
     <Stack.Navigator
-      id="AppStack"
+      id="MainStack"
+      initialRouteName="Login"
       screenOptions={{
         headerShown: true,
         headerBackVisible: true,
+        animation: 'default',
       }}
     >
       <Stack.Screen 
@@ -21,6 +24,7 @@ export default function AppNavigator() {
         component={HomeScreen}
         options={{
           headerTitle: 'Início',
+          headerShown: false,
         }}
       />
       <Stack.Screen 
@@ -35,6 +39,13 @@ export default function AppNavigator() {
         component={RegisterScreen}
         options={{
           headerTitle: 'Cadastro',
+        }}
+      />
+      <Stack.Screen 
+        name="Login"
+        component={LoginScreen}
+        options={{
+          headerTitle: 'Login',
         }}
       />
       <Stack.Screen 
