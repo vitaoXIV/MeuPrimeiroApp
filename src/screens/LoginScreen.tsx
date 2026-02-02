@@ -33,7 +33,7 @@ export default function LoginScreen({ navigation }: any) {
 
 	const handleLogin = async () => {
 		if (!email || !senha) {
-			Alert.alert('Erro', 'Por favor, preencha todos os campos');
+			Alert.alert('Erro', 'Por favor, Preencha corretamente todos os campos');
 			return;
 		}
 
