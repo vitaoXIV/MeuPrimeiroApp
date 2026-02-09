@@ -11,6 +11,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getDatabase, ref, set } from 'firebase/database';
 import { addDoc, collection } from 'firebase/firestore';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, firestore } from '../config/FirebaseConfig';
 
 export default function RegisterScreen({ navigation }: any) {
@@ -78,6 +79,28 @@ export default function RegisterScreen({ navigation }: any) {
         data: new Date().toLocaleDateString('pt-BR'),
       };
 
+      // IMPORTANTE: Criar usuário em Firebase Authentication
+      // Usar uma senha padrão ou solicitar ao usuário
+      const senhaTemporaria = '123456'; // Em produção, pedir ao usuário
+      
+      try {
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          senhaTemporaria
+        );
+        console.log('✅ Usuário criado em Firebase Authentication:', userCredential.user.uid);
+      } catch (authError: any) {
+        if (authError.code === 'auth/email-already-in-use') {
+          Alert.alert('Erro', 'Este email já está cadastrado!');
+          return;
+        } else if (authError.code === 'auth/weak-password') {
+          Alert.alert('Erro', 'Senha muito fraca. Use pelo menos 6 caracteres.');
+          return;
+        }
+        throw authError;
+      }
+
       // Salvar no Firebase Realtime Database
       const database = getDatabase();
       const usuariosRef = ref(database, `usuarios/${novoUsuario.id}`);
@@ -110,7 +133,7 @@ export default function RegisterScreen({ navigation }: any) {
       await AsyncStorage.setItem('usuarios', JSON.stringify(usuarios));
       console.log('✅ Usuário salvo no AsyncStorage');
 
-      Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
+      Alert.alert('Sucesso', 'Cadastro realizado com sucesso!\n\nSenha: ' + senhaTemporaria);
 
       setNome('');
       setEmail('');
@@ -121,7 +144,7 @@ export default function RegisterScreen({ navigation }: any) {
 
       navigation.navigate('List');
     } catch (erro: any) {
-      console.log('❌ Erro ao salvar:', erro);
+      console.error('❌ Erro ao salvar:', erro);
       Alert.alert('Erro', 'Não foi possível salvar os dados: ' + erro.message);
     }
   };
