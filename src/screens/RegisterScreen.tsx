@@ -9,6 +9,9 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getDatabase, ref, set } from 'firebase/database';
+import { addDoc, collection } from 'firebase/firestore';
+import { auth, firestore } from '../config/FirebaseConfig';
 
 export default function RegisterScreen({ navigation }: any) {
   const [nome, setNome] = useState('');
@@ -75,6 +78,20 @@ export default function RegisterScreen({ navigation }: any) {
         data: new Date().toLocaleDateString('pt-BR'),
       };
 
+      // Salvar no Firebase Realtime Database
+      const database = getDatabase();
+      const usuariosRef = ref(database, `usuarios/${novoUsuario.id}`);
+      await set(usuariosRef, novoUsuario);
+      console.log('✅ Usuário salvo no Realtime Database');
+
+      // Salvar no Firebase Firestore
+      await addDoc(collection(firestore, 'usuarios'), {
+        ...novoUsuario,
+        dataCriacao: new Date(),
+      });
+      console.log('✅ Usuário salvo no Firestore');
+
+      // Salvar também no AsyncStorage (local)
       const dados = await AsyncStorage.getItem('usuarios');
       let usuarios: any = [];
 
@@ -91,6 +108,7 @@ export default function RegisterScreen({ navigation }: any) {
 
       usuarios.push(novoUsuario);
       await AsyncStorage.setItem('usuarios', JSON.stringify(usuarios));
+      console.log('✅ Usuário salvo no AsyncStorage');
 
       Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
 
@@ -102,8 +120,9 @@ export default function RegisterScreen({ navigation }: any) {
       setTelefoneError(false);
 
       navigation.navigate('List');
-    } catch (erro) {
-      Alert.alert('Erro', 'Não foi possível salvar os dados');
+    } catch (erro: any) {
+      console.log('❌ Erro ao salvar:', erro);
+      Alert.alert('Erro', 'Não foi possível salvar os dados: ' + erro.message);
     }
   };
 
