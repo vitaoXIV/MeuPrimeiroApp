@@ -23,13 +23,13 @@ export default function LoginScreen({ navigation }: any) {
 	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
+		// Desabilitar navegação de volta, pois é a tela de login
 		const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-			navigation.popToTop();
-			return true;
+			return true; // Retorna true para desabilitar a ação de voltar
 		});
 
 		return () => backHandler.remove();
-	}, [navigation]);
+	}, []);
 
 	const handleLogin = async () => {
 		if (!email || !senha) {
@@ -42,8 +42,9 @@ export default function LoginScreen({ navigation }: any) {
 		try {
 			const userCredential = await signInWithEmailAndPassword(auth, email, senha);
 			const user = userCredential.user;
-			// Login bem-sucedido: navegar para a tela Details (ajuste se necessário)
-			navigation.navigate('Details');
+			// Login bem-sucedido: o contexto de autenticação vai detectar e navegar automaticamente
+			console.log('Login bem-sucedido para:', user.email);
+			// A navegação para AppStack acontece automaticamente no AppNavigator
 		} catch (error: any) {
 			let message = 'Erro ao efetuar login';
 			if (error && error.code) {

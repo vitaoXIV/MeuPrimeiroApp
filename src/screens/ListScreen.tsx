@@ -160,9 +160,9 @@ export default function ListScreen({ navigation }: any) {
       <View style={styles.botoesContainer}>
         <TouchableOpacity
           style={styles.botaoNovo}
-          onPress={() => navigation.navigate('Register')}
+          onPress={() => navigation.navigate('Profile')}
         >
-          <Text style={styles.botaoTexto}>NOVO CADASTRO</Text>
+          <Text style={styles.botaoTexto}>MEU PERFIL</Text>
         </TouchableOpacity>
 
         {mostrarBotaoLimpar ? (
@@ -176,7 +176,7 @@ export default function ListScreen({ navigation }: any) {
 
         <TouchableOpacity
           style={styles.botaoVoltar}
-          onPress={() => navigation.goBack()}
+          onPress={() => navigation.navigate('Home')}
         >
           <Text style={styles.botaoTexto}>VOLTAR</Text>
         </TouchableOpacity>

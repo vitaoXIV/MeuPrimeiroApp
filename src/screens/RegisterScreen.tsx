@@ -18,10 +18,13 @@ export default function RegisterScreen({ navigation }: any) {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [telefone, setTelefone] = useState('');
+  const [senha, setSenha] = useState('');
+  const [confirmaSenha, setConfirmaSenha] = useState('');
 
   const [nomeError, setNomeError] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [telefoneError, setTelefoneError] = useState(false);
+  const [senhaError, setSenhaError] = useState(false);
 
   const validarEmail = (email: string) => {
     const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -35,6 +38,14 @@ export default function RegisterScreen({ navigation }: any) {
 
   const validarNome = (nome: string) => {
     return nome.trim().length >= 3;
+  };
+
+  const validarSenha = (senha: string) => {
+    return senha.length >= 6;
+  };
+
+  const validarConfirmaSenha = (senha: string, confirmaSenha: string) => {
+    return senha === confirmaSenha && senha.length >= 6;
   };
 
   const validarFormulario = () => {
@@ -61,6 +72,13 @@ export default function RegisterScreen({ navigation }: any) {
       setTelefoneError(false);
     }
 
+    if (!validarConfirmaSenha(senha, confirmaSenha)) {
+      setSenhaError(true);
+      temErro = true;
+    } else {
+      setSenhaError(false);
+    }
+
     return !temErro;
   };
 
@@ -80,14 +98,12 @@ export default function RegisterScreen({ navigation }: any) {
       };
 
       // IMPORTANTE: Criar usuário em Firebase Authentication
-      // Usar uma senha padrão ou solicitar ao usuário
-      const senhaTemporaria = '123456'; // Em produção, pedir ao usuário
-      
+      // Usar a senha inserida pelo usuário
       try {
         const userCredential = await createUserWithEmailAndPassword(
           auth,
           email,
-          senhaTemporaria
+          senha
         );
         console.log('✅ Usuário criado em Firebase Authentication:', userCredential.user.uid);
       } catch (authError: any) {
@@ -133,16 +149,19 @@ export default function RegisterScreen({ navigation }: any) {
       await AsyncStorage.setItem('usuarios', JSON.stringify(usuarios));
       console.log('✅ Usuário salvo no AsyncStorage');
 
-      Alert.alert('Sucesso', 'Cadastro realizado com sucesso!\n\nSenha: ' + senhaTemporaria);
+      Alert.alert('Sucesso', 'Cadastro realizado com sucesso!\n\nVocê pode fazer login agora.');
 
       setNome('');
       setEmail('');
       setTelefone('');
+      setSenha('');
+      setConfirmaSenha('');
       setNomeError(false);
       setEmailError(false);
       setTelefoneError(false);
+      setSenhaError(false);
 
-      navigation.navigate('List');
+      navigation.navigate('Login');
     } catch (erro: any) {
       console.error('❌ Erro ao salvar:', erro);
       Alert.alert('Erro', 'Não foi possível salvar os dados: ' + erro.message);
@@ -237,6 +256,57 @@ export default function RegisterScreen({ navigation }: any) {
         {telefoneError ? <Text style={styles.textoErro}>Telefone deve conter 11 dígitos</Text> : null}
       </View>
 
+      <View style={styles.fieldContainer}>
+        <Text style={styles.label}>Senha</Text>
+        {senhaError ? <TextInput
+          style={styles.inputError}
+          placeholder="Digite uma senha (mínimo 6 caracteres)"
+          placeholderTextColor="#999"
+          secureTextEntry
+          value={senha}
+          onChangeText={(texto) => {
+            setSenha(texto);
+            setSenhaError(false);
+          }}
+        /> : <TextInput
+          style={styles.input}
+          placeholder="Digite uma senha (mínimo 6 caracteres)"
+          placeholderTextColor="#999"
+          secureTextEntry
+          value={senha}
+          onChangeText={(texto) => {
+            setSenha(texto);
+            setSenhaError(false);
+          }}
+        />}
+      </View>
+
+      <View style={styles.fieldContainer}>
+        <Text style={styles.label}>Confirmar Senha</Text>
+        {senhaError ? <TextInput
+          style={styles.inputError}
+          placeholder="Confirme a senha"
+          placeholderTextColor="#999"
+          secureTextEntry
+          value={confirmaSenha}
+          onChangeText={(texto) => {
+            setConfirmaSenha(texto);
+            setSenhaError(false);
+          }}
+        /> : <TextInput
+          style={styles.input}
+          placeholder="Confirme a senha"
+          placeholderTextColor="#999"
+          secureTextEntry
+          value={confirmaSenha}
+          onChangeText={(texto) => {
+            setConfirmaSenha(texto);
+            setSenhaError(false);
+          }}
+        />}
+        {senhaError ? <Text style={styles.textoErro}>Senhas não correspondem ou têm menos de 6 caracteres</Text> : null}
+      </View>
+
       <View style={styles.botoesContainer}>
         <TouchableOpacity 
           style={styles.botaoSalvar}
@@ -246,17 +316,10 @@ export default function RegisterScreen({ navigation }: any) {
         </TouchableOpacity>
 
         <TouchableOpacity 
-          style={styles.botaoLista}
-          onPress={() => navigation.navigate('List')}
-        >
-          <Text style={styles.botaoTexto}>VER CADASTRADOS</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
           style={styles.botaoVoltar}
-          onPress={() => navigation.goBack()}
+          onPress={() => navigation.navigate('Login')}
         >
-          <Text style={styles.botaoTexto}>VOLTAR</Text>
+          <Text style={styles.botaoTexto}>VOLTAR AO LOGIN</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -314,13 +377,6 @@ const styles = StyleSheet.create({
   },
   botaoSalvar: {
     backgroundColor: '#4CAF50',
-    borderRadius: 8,
-    padding: 14,
-    marginBottom: 12,
-    alignItems: 'center',
-  },
-  botaoLista: {
-    backgroundColor: '#2196F3',
     borderRadius: 8,
     padding: 14,
     marginBottom: 12,

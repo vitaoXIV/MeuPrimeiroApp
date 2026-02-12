@@ -26,7 +26,7 @@ export default function ProfileScreen({ navigation }: any) {
   };
 
   const handleVoltar = () => {
-    navigation.goBack?.();
+    navigation.navigate('Home');
   };
 
   return (
