@@ -1,80 +1,51 @@
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useEffect, useContext, use } from 'react';
+import { onAuthStateChanged, signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
 import { auth } from '../config/FirebaseConfig';
-import { onAuthStateChanged, User, signOut } from 'firebase/auth';
-import { ActivityIndicator, View } from 'react-native';
 
-interface AuthContextType {
+//criando o tipo de contexto
+
+interface AuthContextData {
   user: User | null;
   loading: boolean;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  isAuthenticated: boolean;
 }
 
-export const AuthContext = createContext<AuthContextType>({
-  user: null,
-  loading: true,
-  logout: async () => {},
-  isAuthenticated: false,
-});
+//criando o contexto
+const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+//criando o provider
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  //persistência do usuário logado no app, para não precisar logar toda vez que abrir o app
 
   useEffect(() => {
-    // Verificar o estado de autenticação quando a aplicação inicia
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      console.log('Estado de autenticação mudou:', currentUser?.email || 'usuário não autenticado');
-      setUser(currentUser);
+    const unsubscribe = onAuthStateChanged(auth, (userLogged) => {
+      setUser(userLogged);
       setLoading(false);
     });
-
-    // Cleanup: desinscrever quando o componente for desmontado
     return () => unsubscribe();
   }, []);
 
-  const logout = async () => {
-    try {
-      await signOut(auth);
-      setUser(null);
-      console.log('Logout realizado com sucesso');
-    } catch (error) {
-      console.error('Erro ao fazer logout:', error);
-      throw error;
-    }
+  //funçao de login
+  const login = async (email: string, password: string) => {
+    await signInWithEmailAndPassword(auth, email, password);
   };
 
-  // Mostrar loading enquanto verifica o estado de autenticação
-  if (loading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
-  }
-
-  const value = {
-    user,
-    loading,
-    logout,
-    isAuthenticated: user !== null,
+  //funçao de logout
+  const logout = async () => {
+    await signOut(auth);
   };
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => {
-  const context = React.useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
-  }
-  return context;
-};
+//hook para usar o contexto de autenticação
+export function useAuth () {
+  return useContext(AuthContext);
+}
